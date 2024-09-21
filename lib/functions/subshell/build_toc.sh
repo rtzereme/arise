@@ -1,9 +1,9 @@
 #!/bin/bash
-#############                                                                                            
+#############
 # DESCRIPTION
 #############
 # Creates a table of contents at the location of the specified source file.
-# 
+#
 #############
 # Usage:
 # build_toc index.md
@@ -19,14 +19,19 @@ build_header index.html
 
 # Add the title and start of the table for the TOC
 cat >> index.html <<EOF
-        <h1>$title</h1> 
-        <p id="arise-toc">
-        <table id="arise-toc-table">
-        <tr class="arise-toc-tr">
-                <th class="arise-toc-th">Date</th>
-                <th class="arise-toc-th">Title</th>
-                <th class="arise-toc-th">Description</th>
-        </tr>
+      <!-- Table -->
+      <section id="table">
+        <h2>$title</h2>
+        <div class="overflow-auto">
+          <table class="striped">
+            <thead>
+              <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Title</th>
+                <th scope="col">Description</th>
+              </tr>
+            </thead>
+            <tbody>
 EOF
 clear_metadata
 
@@ -34,7 +39,7 @@ clear_metadata
 toc_tmp="arise-toc-$RANDOM.tmp"
 find . -mindepth 2 -maxdepth 2 -type f -name 'index.md' | while read fname; do
 get_page_metadata $fname
-echo '<tr class="arise-toc-tr"><td class="arise-toc-td">'"$published_date"'</td><td class="arise-toc-td"><a href="'"$canonical_url"'">'"$title"'</a></td><td class="arise-toc-td">'"$description"'</td></tr>' >> $toc_tmp
+echo '<tr><td>'"$published_date"'</td><td><a href="'"$canonical_url"'">'"$title"'</a></td><td>'"$description"'</td></tr>' >> $toc_tmp
 clear_metadata
 done
 
@@ -44,8 +49,11 @@ rm $toc_tmp
 
 # Final page bits
 cat >> index.html <<EOF
-        </table>
-        </p>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <!-- ./ Tables -->
 EOF
 build_footer index.html
 )
