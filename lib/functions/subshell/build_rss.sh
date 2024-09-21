@@ -1,5 +1,5 @@
 #!/bin/bash
-#############                                                                                            
+#############
 # DESCRIPTION
 #############
 # Recursively crawls through the site and reads page metadata to generate an RSS feed for all content on the website.
@@ -57,13 +57,14 @@ page_index=$(realpath "$fname"'/index.md')
                 if [[ $rss_hide != "true" ]] && [[ $is_toc != "true" ]]; then
                         # Convert html's ISO8601 date to RSS's RFC-822. Fuck you RSS.
                         rss_date=$(date -d "$published_date" --rfc-822)
-                        
+
                         cat >> $rss <<EOF
         <item>
         <title>$title</title>
         <dc:creator>$author</dc:creator>
         <description>$description</description>
         <link>$canonical_url</link>
+        <guid isPermaLink="false">tag:$guidtag:$guid</guid>
         <pubDate>$rss_date</pubDate>
         </item>
 EOF

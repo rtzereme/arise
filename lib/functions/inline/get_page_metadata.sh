@@ -1,5 +1,5 @@
 #!/bin/bash
-#############                                                                                            
+#############
 # DESCRIPTION
 #############
 # Pulls all the Arise-specific metadata from the header of a given page.
@@ -24,7 +24,7 @@ get_page_metadata() {
                 author="${author%\"}"
                 author="${author#Author:: }"
                 author="${author#\"}"
-                
+
                 description="$(grep "Description::" <<< $metadata)"
                 description="${description%\"}"
                 description="${description#Description:: }"
@@ -34,7 +34,7 @@ get_page_metadata() {
                 language="${language%\"}"
                 language="${language#Language:: }"
                 language="${language#\"}"
-                
+
                 thumbnail="$(grep "Thumbnail::" <<< $metadata)"
                 thumbnail="${thumbnail%\"}"
                 thumbnail="${thumbnail#Thumbnail:: }"
@@ -50,6 +50,11 @@ get_page_metadata() {
                 modified_date="${modified_date#Modified Date:: }"
                 modified_date="${modified_date#\"}"
 
+                guid="$(grep "Guid::" <<< $metadata)"
+                guid="${guid%\"}"
+                guid="${guid#Guid:: }"
+                guid="${guid#\"}"
+
                 # Clean metadata of XML special characters so we don't break the sitemap or RSS feed
                 title="$(clean_xml_string "$title")"
                 author="$(clean_xml_string "$author")"
@@ -58,7 +63,8 @@ get_page_metadata() {
                 thumbnail="$(clean_xml_string "$thumbnail")"
                 published_date="$(clean_xml_string "$published_date")"
                 modified_date="$(clean_xml_string "$modified_date")"
-                
+                guid="$(clean_xml_string "$guid")"
+
                 # Optional page settings with default settings
 
                 # is_toc default: false
@@ -66,13 +72,13 @@ get_page_metadata() {
                 if [[ $is_toc != "true" ]]; then
                         is_toc="false"
                 fi
-                        
+
                 # process_markdown default: true
                 process_markdown=$(grep "process_markdown::" <<< $metadata | cut -d '"' -f2)
                 if [[ $process_markdown != "false" ]]; then
                         process_markdown="true"
                 fi
-                
+
                 # content_header default: true
                 content_header=$(grep "content_header::" <<< $metadata | cut -d '"' -f2)
                 if [[ $content_header != "false" ]]; then
@@ -84,13 +90,20 @@ get_page_metadata() {
                 if [[ $rss_hide != "true" ]]; then
                         rss_hide="false"
                 fi
-                
+
                 # URL
                 relative_url="$(realpath $(dirname $1) | sed 's@.*arise-out@@g')"'/'
                 canonical_url="$base_url""$relative_url"
+
+                # if no guid fail
+                if [ -z "${guid}" ] ; then
+                    echo "Missing Duid for ${relative_url}. Failing."
+                    clear_metadata
+                    exit 1
+                fi
         else
                 # Clear out metadata so that anything calling this function expecting to get new data cannot get old values on accident if the requested file does not exist.
                 clear_metadata
         fi
 
-} 
+}
