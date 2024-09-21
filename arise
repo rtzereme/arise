@@ -56,6 +56,11 @@ elif [[ $@ == "build -f" ]]; then
                 echo 'Aborting.';
                 exit 1;
         fi;
+elif [[ $@ == "build -fy" ]]; then
+        arise_build="full"
+        echo "Starting site deploy. Building full site. Overwiting arise-out.."
+        echo;
+        force_overwrite=true;
 elif [[ $@ == "build -kf" ]] || [[ $@ == "build -fk" ]]; then
         arise_build="full"
         keep_source=true
